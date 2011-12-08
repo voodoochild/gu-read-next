@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+import random
 import requests
 import json
 
@@ -15,6 +16,7 @@ def index():
     add_feed(feeds, 'Latest comment', 'commentisfree')
     add_feed(feeds, 'Latest sport', 'sport')
     add_feed(feeds, 'Latest music', 'music')
+    random.shuffle(feeds)
     response = render_template('index.html', feeds=feeds)
     # set max-age http header
     return response

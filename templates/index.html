@@ -5,14 +5,16 @@
 <div class="eight-col read-next">
   <div class="hd">
     {% for feed in feeds %}
-    <h2>{{ feed.title }}</h2>
-    <ul>
-      {% for article in feed.articles %}
-      <li>
-        <a href="{{ article.url }}">{{ article.title }}</a>
-      </li>
-      {% endfor %}
-    </ul>
+    <div class="page{% if not loop.first %} hidden{% endif %}">
+      <h2>{{ feed.title }}</h2>
+      <ul>
+        {% for article in feed.articles %}
+        <li>
+          <a href="{{ article.url }}">{{ article.title }}</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
     {% endfor %}
   </div>
 </div>
