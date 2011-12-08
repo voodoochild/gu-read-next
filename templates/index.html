@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if feeds %}
+<div class="eight-col read-next">
+  <div class="hd">
+    {% for feed in feeds %}
+    <h2>{{ feed.title }}</h2>
+    <ul>
+      {% for article in feed.articles %}
+      <li>
+        <a href="{{ article.url }}">{{ article.title }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock content %}

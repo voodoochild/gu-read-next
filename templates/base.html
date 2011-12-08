@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}What do you want to read next?{% endblock title %}</title>
+  {% block stylesheets %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/readnext.css') }}" media="all">
+  {% endblock stylesheets %}
+</head>
+<body>
+  {% block content %}{% endblock content %}
+  {% block javascript %}
+  <script src="{{ url_for('static', filename='js/jquery-1.6.2.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/readnext.js') }}"></script>
+  {% endblock javascript %}
+</body>
+</html>
