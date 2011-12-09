@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, abort
 import random
 import requests
 import json
@@ -8,7 +8,7 @@ CONTENT_API = 'http://content.guardianapis.com/search'
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     """Index view."""
     feeds = []
@@ -17,9 +17,9 @@ def index():
     add_feed(feeds, 'Latest sport', 'sport')
     add_feed(feeds, 'Latest music', 'music')
     random.shuffle(feeds)
-    response = render_template('index.html', feeds=feeds)
-    # set max-age http header
-    return response
+    if not feeds:
+        abort(404)
+    return render_template('index.html', feeds=feeds)
 
 def add_feed(feeds, title, section):
     """Adds a feed to be obtained and outputted."""
@@ -45,14 +45,21 @@ def process_json(data):
         data = json.loads(data)
         results = []
         for result in data['response']['results']:
-            results.append({
-                'title': result['webTitle'],
-                'url': result['webUrl'],
-                #'thumbnail': result['fields']['thumbnail']
-            })
+            results.append(build_article_dict(result))
         return results
-    
     return False
+
+def build_article_dict(json):
+    """Parses supplied JSON to build a dictionary for an article."""
+    article = {
+        'title': json['webTitle'],
+        'url': json['webUrl'],
+    }
+    try:
+        article['thumbnail'] = json['fields']['thumbnail']
+    except KeyError:
+        pass
+    return article
 
 if __name__ == "__main__":
     app.run(debug=True)

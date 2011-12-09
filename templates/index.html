@@ -10,7 +10,14 @@
       <ul>
         {% for article in feed.articles %}
         <li>
-          <a href="{{ article.url }}">{{ article.title }}</a>
+          <a href="{{ article.url }}" title="{{ article.title|safe }}">
+            {% if article.thumbnail %}
+            <img src="{{ article.thumbnail }}">
+            {% else %}
+            <img src="http://placekitten.com/g/140/84">
+            {% endif %}
+            <h3>{{ article.title|safe }}</h3>
+          </a>
         </li>
         {% endfor %}
       </ul>

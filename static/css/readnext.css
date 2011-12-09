@@ -1,5 +1,45 @@
-.hidden {
-    //position: absolute;
-    //left: -9999px;
-    opacity: .25;
+.read-next {
+    border: 3px solid #ededed;
+    border-radius: 10px;
+    font: normal 16px/1 Ubuntu, sans-serif;
+    padding: 5px;
+    width: 620px;
+}
+
+.read-next .hidden {
+    position: absolute;
+    left: -9999px;
+}
+
+.read-next a,
+.read-next a:visited,
+.read-next a:active,
+.read-next a:hover {
+    color: #005689;
+    text-decoration: none;
+}
+
+.read-next ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.read-next ul li {
+    clear: both;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.read-next ul li img {
+    float: left;
+}
+
+.read-next ul li h3 {
+    float: left;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 1.5;
+    margin-left: 10px;
+    width: 70%;
 }
