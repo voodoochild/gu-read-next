@@ -1,6 +1,5 @@
 from flask import Flask, render_template, abort
 import random
-import requests
 import json
 
 CONTENT_API = 'http://content.guardianapis.com/search'
@@ -34,9 +33,20 @@ def get_articles_for_section(section):
 
 def call_content_api(url):
     """Attempts to retrieve data from the Content API."""
-    r = requests.get(app.config['CONTENT_API'] + url)
-    if r.status_code == 200:
-        return r.content
+    try:
+        from google.appengine.api import urlfetch
+        r = urlfetch.fetch(app.config['CONTENT_API'] + url, method=urlfetch.GET)
+        if r.status_code == 200:
+            return r.content
+    except ImportError:
+        pass # not running on app engine
+    try:
+        import requests
+        r = requests.get(app.config['CONTENT_API'] + url)
+        if r.status_code == 200:
+            return r.content
+    except ImportError:
+        pass
     return False
 
 def process_json(data):
