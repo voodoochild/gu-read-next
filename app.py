@@ -30,6 +30,8 @@ def readnext():
     rss = RssFeeds(feeds)
     rss.add_feed('World lead stories', 'http://www.guardian.co.uk/world/lead/rss')
     rss.add_feed('Environment lead stories', 'http://www.guardian.co.uk/environment/lead/rss')
+    rss.add_feed('Society great features', 'http://thelonggoodread.com/category/society/rss')
+    rss.add_feed('World news great features', 'http://thelonggoodread.com/category/world-news/rss')
     
     random.shuffle(feeds)
     if not feeds:
@@ -98,10 +100,13 @@ class RssFeeds(DataGrabber):
             'title': data['title'],
             'url': data['link'],
         }
-
-        for media in data['media_content']:
-            if media['width'] == u'140' and media['height'] == u'84':
-                article['thumbnail'] = media['url']
+        
+        try:
+            for media in data['media_content']:
+                if media['width'] == u'140' and media['height'] == u'84':
+                    article['thumbnail'] = media['url']
+        except KeyError:
+            pass
         return article
 
 
