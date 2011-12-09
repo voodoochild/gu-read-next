@@ -8,7 +8,7 @@ CONTENT_API = 'http://content.guardianapis.com/search'
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-@app.route('/', methods=['GET'])
+@app.route('/readnext', methods=['GET'])
 def index():
     """Index view."""
     feeds = []
