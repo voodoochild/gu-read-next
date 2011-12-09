@@ -1,4 +1,5 @@
 from flask import Flask, render_template, abort
+import requests
 import random
 import json
 
@@ -11,16 +12,16 @@ app.config.from_object(__name__)
 def index():
     """Index view."""
     feeds = []
-    add_feed(feeds, 'Latest news', 'news')
-    add_feed(feeds, 'Latest comment', 'commentisfree')
-    add_feed(feeds, 'Latest sport', 'sport')
-    add_feed(feeds, 'Latest music', 'music')
+    add_api_feed(feeds, 'Latest news', 'news')
+    add_api_feed(feeds, 'Latest comment', 'commentisfree')
+    add_api_feed(feeds, 'Latest sport', 'sport')
+    add_api_feed(feeds, 'Latest music', 'music')
     random.shuffle(feeds)
     if not feeds:
         abort(404)
     return render_template('index.html', feeds=feeds)
 
-def add_feed(feeds, title, section):
+def add_api_feed(feeds, title, section):
     """Adds a feed to be obtained and outputted."""
     feed = process_json(get_articles_for_section(section))
     if feed:
@@ -33,20 +34,9 @@ def get_articles_for_section(section):
 
 def call_content_api(url):
     """Attempts to retrieve data from the Content API."""
-    try:
-        from google.appengine.api import urlfetch
-        r = urlfetch.fetch(app.config['CONTENT_API'] + url, method=urlfetch.GET)
-        if r.status_code == 200:
-            return r.content
-    except ImportError:
-        pass # not running on app engine
-    try:
-        import requests
-        r = requests.get(app.config['CONTENT_API'] + url)
-        if r.status_code == 200:
-            return r.content
-    except ImportError:
-        pass
+    r = requests.get(app.config['CONTENT_API'] + url)
+    if r.status_code == 200:
+        return r.content
     return False
 
 def process_json(data):

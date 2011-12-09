@@ -12,9 +12,9 @@
         <li>
           <a href="{{ article.url }}" title="{{ article.title|safe }}">
             {% if article.thumbnail %}
-            <img src="{{ article.thumbnail }}">
+            <img src="{{ article.thumbnail }}" width="140" height="84">
             {% else %}
-            <img src="http://placekitten.com/g/140/84">
+            <img src="http://placekitten.com/g/140/84" width="140" height="84">
             {% endif %}
             <h3>{{ article.title|safe }}</h3>
           </a>
