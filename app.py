@@ -98,6 +98,10 @@ class RssFeeds(DataGrabber):
             'title': data['title'],
             'url': data['link'],
         }
+
+        for media in data['media_content']:
+            if media['width'] == u'140' and media['height'] == u'84':
+                article['thumbnail'] = media['url']
         return article
 
 
