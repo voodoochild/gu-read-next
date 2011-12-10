@@ -32,11 +32,12 @@
 }
 
 .read-next h2 {
+    font-size: 18px;
     text-align: center;
 }
 
 .read-next h3 {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: normal;
     line-height: 1.5;
     text-align: center;

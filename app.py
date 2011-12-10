@@ -29,6 +29,9 @@ def readnext():
     api.add_feed('Music', 'music')
     api.add_feed('Film', 'film')
     api.add_feed('Culture', 'culture')
+    api.add_feed('Environment', 'environment')
+    api.add_feed('TV', 'tv-and-radio')
+    api.add_feed('Life &amp; Style', 'lifeandstyle')
     
     if not feeds:
         abort(404)

@@ -7,7 +7,7 @@
     <ul>
       {% for feed in feeds %}
       <li{% if loop.last %} class="last"{% endif %}>
-        <h2>{{ feed.title }}</h2>
+        <h2>{{ feed.title|safe }}</h2>
         <ul>
           {% for article in feed.feed %}
           <li>
