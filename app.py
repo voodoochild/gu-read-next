@@ -1,10 +1,12 @@
-from flask import Flask, make_response, render_template, abort, redirect, url_for
+from flask import Flask, make_response, render_template, abort, redirect, url_for, request
 import requests
 import random
-import json
+import simplejson
 import feedparser
 
 CONTENT_API = 'http://content.guardianapis.com/search'
+ITEMS_PER_FEED = 10     # how many items to retrieve per feed
+ITEMS_TO_DISPLAY = 1    # how many items to show in the component per feed
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -16,28 +18,22 @@ def index():
 
 @app.route('/readnext', methods=['GET'])
 def readnext():
-    """Read next component."""
+    """Display four feeds at random."""
     feeds = []
-    
-    # API feeds
     api = ContentApi(feeds)
-    api.add_feed('Latest news', 'news')
-    api.add_feed('Latest comment', 'commentisfree')
-    api.add_feed('Latest sport', 'sport')
-    api.add_feed('Latest music', 'music')
-    
-    # RSS feeds
     rss = RssFeeds(feeds)
-    rss.add_feed('World lead stories', 'http://www.guardian.co.uk/world/lead/rss')
-    rss.add_feed('Environment lead stories', 'http://www.guardian.co.uk/environment/lead/rss')
-    rss.add_feed('Society great features', 'http://thelonggoodread.com/category/society/rss')
-    rss.add_feed('World news great features', 'http://thelonggoodread.com/category/world-news/rss')
     
-    random.shuffle(feeds)
+    api.add_feed('News', 'news')
+    api.add_feed('Comment', 'commentisfree')
+    api.add_feed('Sport', 'sport')
+    api.add_feed('Music', 'music')
+    api.add_feed('Film', 'film')
+    api.add_feed('Culture', 'culture')
+    
     if not feeds:
         abort(404)
-    
-    response = make_response(render_template('index.html', feeds=feeds))
+    random.shuffle(feeds)
+    response = make_response(render_template('component.html', feeds=feeds[:4]))
     return response
 
 
@@ -57,7 +53,9 @@ class DataGrabber:
         """Add a feed to be grabbed."""
         feed = self.process_data(self.get_data(key))
         if feed:
-            self.feeds.append({'title': title, 'feed': feed})
+            random.shuffle(feed)
+            limit = app.config['ITEMS_TO_DISPLAY']
+            self.feeds.append({'title': title, 'feed': feed[:limit]})
     
     def get_data(self, key):
         """Attempt to retrieve data."""
@@ -75,9 +73,45 @@ class DataGrabber:
         pass
 
 
+class ContentApi(DataGrabber):
+    """Methods to request and process Content API data."""
+    API_PARAMS = '%s?section=%s&page-size=%s&format=json&show-fields=thumbnail'
+    
+    def add_feed(self, title, key):
+        """Add an API feed using a set of predetermined parameters."""
+        url =  self.API_PARAMS % (
+            app.config['CONTENT_API'], key, app.config['ITEMS_PER_FEED'])
+        feed = self.process_data(self.get_data(url))
+        if feed:
+            random.shuffle(feed)
+            limit = app.config['ITEMS_TO_DISPLAY']
+            self.feeds.append({'title': title, 'feed': feed[:limit]})
+
+    def process_data(self, data):
+        """Process Content API JSON data."""
+        if data:
+            json_data = simplejson.loads(data)
+            items = []
+            for result in json_data['response']['results']:
+                items.append(self.build_item(result))
+            return items
+        return False
+
+    def build_item(self, data):
+        """Transform JSON data into a dictionary that the template can use."""
+        article = {
+            'title': data['webTitle'],
+            'url': data['webUrl'],
+        }
+        try:
+            article['thumbnail'] = data['fields']['thumbnail']
+        except KeyError:
+            pass
+        return article
+
+
 class RssFeeds(DataGrabber):
     """Methods to request and process Guardian RSS feed data."""
-    ITEMS_TO_SHOW = 3
     
     def process_data(self, data):
         """Process Guardian RSS feed data."""
@@ -86,7 +120,7 @@ class RssFeeds(DataGrabber):
             items = []
             i = 0
             for entry in rss_data.entries:
-                if i < self.ITEMS_TO_SHOW:
+                if i < app.config['ITEMS_PER_FEED']:
                     items.append(self.build_item(entry))
                     i = i + 1
                 else:
@@ -105,40 +139,6 @@ class RssFeeds(DataGrabber):
             for media in data['media_content']:
                 if media['width'] == u'140' and media['height'] == u'84':
                     article['thumbnail'] = media['url']
-        except KeyError:
-            pass
-        return article
-
-
-class ContentApi(DataGrabber):
-    """Methods to request and process Content API data."""
-    API_PARAMS = '%s?section=%s&page-size=3&format=json&show-fields=thumbnail'
-    
-    def add_feed(self, title, key):
-        """Add an API feed using a set of predetermined parameters."""
-        url =  self.API_PARAMS % (app.config['CONTENT_API'], key)
-        feed = self.process_data(self.get_data(url))
-        if feed:
-            self.feeds.append({'title': title, 'feed': feed})
-
-    def process_data(self, data):
-        """Process Content API JSON data."""
-        if data:
-            json_data = json.loads(data)
-            items = []
-            for result in json_data['response']['results']:
-                items.append(self.build_item(result))
-            return items
-        return False
-
-    def build_item(self, data):
-        """Transform JSON data into a dictionary that the template can use."""
-        article = {
-            'title': data['webTitle'],
-            'url': data['webUrl'],
-        }
-        try:
-            article['thumbnail'] = data['fields']['thumbnail']
         except KeyError:
             pass
         return article

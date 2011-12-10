@@ -2,13 +2,8 @@
     border: 3px solid #ededed;
     border-radius: 10px;
     font: normal 16px/1 Ubuntu, sans-serif;
-    padding: 5px;
-    width: 620px;
-}
-
-.read-next .hidden {
-    position: absolute;
-    left: -9999px;
+    padding: 0 15px;
+    width: 590px;
 }
 
 .read-next a,
@@ -22,24 +17,27 @@
 .read-next ul {
     list-style: none;
     margin: 0;
+    overflow: hidden;
     padding: 0;
 }
 
 .read-next ul li {
-    clear: both;
-    margin-bottom: 10px;
-    overflow: hidden;
+    float: left;
+    margin-right: 10px;
+    width: 140px;
 }
 
-.read-next ul li img {
-    float: left;
+.read-next ul li.last {
+    margin-right: 0;
 }
 
-.read-next ul li h3 {
-    float: left;
+.read-next h2 {
+    text-align: center;
+}
+
+.read-next h3 {
     font-size: 14px;
     font-weight: normal;
     line-height: 1.5;
-    margin-left: 10px;
-    width: 70%;
+    text-align: center;
 }

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if feeds %}
+<div class="eight-col read-next">
+  <div class="hd">
+    <ul>
+      {% for feed in feeds %}
+      <li{% if loop.last %} class="last"{% endif %}>
+        <h2>{{ feed.title }}</h2>
+        <ul>
+          {% for article in feed.feed %}
+          <li>
+            <a href="{{ article.url }}" title="{{ article.title|safe }}">
+              {% if article.thumbnail %}
+              <img src="{{ article.thumbnail }}" width="140" height="84">
+              {% else %}
+              <img src="http://placekitten.com/g/140/84" width="140" height="84">
+              {% endif %}
+              <h3>{{ article.title|safe }}</h3>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </li>
+      {% endfor %}
+    </ul>  
+  </div>
+</div>
+{% endif %}
+{% endblock content %}
