@@ -1,5 +1,4 @@
 <!-- {microapp-css:{{ url_for('static', filename='css/readnext.css') }}} -->
-<!-- {microapp-javascript:{{ url_for('static', filename='js/readnext.js') }}} -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,9 +11,5 @@
 </head>
 <body>
   {% block content %}{% endblock content %}
-  {% block javascript %}
-  <script src="{{ url_for('static', filename='js/jquery-1.6.2.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/readnext.js') }}"></script>
-  {% endblock javascript %}
 </body>
 </html>

@@ -1,14 +1,15 @@
 from flask import make_response, render_template, abort, redirect, url_for, request
 from readnext import app
+from BeautifulSoup import BeautifulStoneSoup
 import random
 import simplejson
-from BeautifulSoup import BeautifulStoneSoup
 
 
 @app.route('/', methods=['GET'])
 def index():
     """Index view. Currently just redirects to the only available component."""
     return redirect(url_for('readnext'))
+
 
 @app.route('/readnext', methods=['GET'])
 def readnext():
