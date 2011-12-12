@@ -1,15 +1,9 @@
-from flask import Flask, make_response, render_template, abort, redirect, url_for, request
-import requests
+from flask import make_response, render_template, abort, redirect, url_for, request
+from readnext import app
 import random
 import simplejson
-import feedparser
+from BeautifulSoup import BeautifulStoneSoup
 
-CONTENT_API = 'http://content.guardianapis.com/search'
-ITEMS_PER_FEED = 10     # how many items to retrieve per feed
-ITEMS_TO_DISPLAY = 1    # how many items to show in the component per feed
-
-app = Flask(__name__)
-app.config.from_object(__name__)
 
 @app.route('/', methods=['GET'])
 def index():
@@ -23,6 +17,7 @@ def readnext():
     api = ContentApi(feeds)
     rss = RssFeeds(feeds)
     
+    # API feeds.
     api.add_feed('News', 'news')
     api.add_feed('Comment', 'commentisfree')
     api.add_feed('Sport', 'sport')
@@ -32,6 +27,9 @@ def readnext():
     api.add_feed('Environment', 'environment')
     api.add_feed('TV', 'tv-and-radio')
     api.add_feed('Life &amp; Style', 'lifeandstyle')
+    
+    # RSS feeds.
+    rss.add_feed('News Leads', 'http://www.guardian.co.uk/world/lead/rss')
     
     if not feeds:
         abort(404)
@@ -62,9 +60,24 @@ class DataGrabber:
     
     def get_data(self, key):
         """Attempt to retrieve data."""
-        r = requests.get(key)
-        if r.status_code == 200:
-            return r.content
+        # Try App Engine's urlfetch first.
+        try:
+            from google.appengine.api import urlfetch
+            r = urlfetch.fetch(key, method=urlfetch.GET)
+            if r.status_code == 200:
+                return r.content
+        except ImportError:
+            pass
+        
+        # If that wasn't available, try requests.
+        try:
+            import requests
+            r = requests.get(key)
+            if r.status_code == 200:
+                return r.content
+        except ImportError:
+            abort(500)
+        
         return False
     
     def process_data(self, data):
@@ -119,10 +132,10 @@ class RssFeeds(DataGrabber):
     def process_data(self, data):
         """Process Guardian RSS feed data."""
         if data:
-            rss_data = feedparser.parse(data)
+            soup = BeautifulStoneSoup(data)
             items = []
             i = 0
-            for entry in rss_data.entries:
+            for entry in soup.findAll('item'):
                 if i < app.config['ITEMS_PER_FEED']:
                     items.append(self.build_item(entry))
                     i = i + 1
@@ -134,16 +147,14 @@ class RssFeeds(DataGrabber):
     def build_item(self, data):
         """Transform RSS data into a dictionary that the template can use."""
         article = {
-            'title': data['title'],
-            'url': data['link'],
+            'title': data.title.contents[0],
+            'url': data.link.contents[0],
         }
         
-        try:
-            for media in data['media_content']:
-                if media['width'] == u'140' and media['height'] == u'84':
-                    article['thumbnail'] = media['url']
-        except KeyError:
-            pass
+        media = data.findAll('media:content')
+        for m in media:
+            if m['width'] == u'140' and m['height'] == u'84':
+                    article['thumbnail'] = m['url']
         return article
 
 
