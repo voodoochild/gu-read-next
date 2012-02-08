@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<microapp interface-version="1" version="1.0">
-  <resources>
-    <resource-definition cms-path-pattern="" display-name="" name="" path=""/>
-  </resources>
+<microapp name="read-next" provider="guardian.co.uk" interface-version="1" version="1.0">
+  <components>
+    <component-definition display-name="readNext" name="readNext" path="readnext" widths="620" />
+  </components>
 </microapp>

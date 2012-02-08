@@ -1,4 +1,4 @@
 Flask
 requests
-feedparser
+BeautifulSoup
 simplejson

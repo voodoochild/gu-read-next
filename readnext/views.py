@@ -154,8 +154,11 @@ class RssFeeds(DataGrabber):
         
         media = data.findAll('media:content')
         for m in media:
-            if m['width'] == u'140' and m['height'] == u'84':
-                    article['thumbnail'] = m['url']
+            try:
+                if m['width'] == u'140' and m['height'] == u'84':
+                        article['thumbnail'] = m['url']
+            except KeyError:
+                pass
         return article
 
 
